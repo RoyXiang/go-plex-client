@@ -14,9 +14,9 @@ import (
 // TimelineEntry ...
 type TimelineEntry struct {
 	Identifier    string `json:"identifier"`
-	ItemID        int64  `json:"itemID"`
+	ItemID        string `json:"itemID"`
 	MetadataState string `json:"metadataState"`
-	SectionID     int64  `json:"sectionID"`
+	SectionID     string `json:"sectionID"`
 	State         int64  `json:"state"`
 	Title         string `json:"title"`
 	Type          int64  `json:"type"`
@@ -150,17 +150,26 @@ type NotificationEvents struct {
 func NewNotificationEvents() *NotificationEvents {
 	return &NotificationEvents{
 		events: map[string]func(n NotificationContainer){
-			"playing":                   func(n NotificationContainer) {},
-			"reachability":              func(n NotificationContainer) {},
-			"transcode.end":             func(n NotificationContainer) {},
-			"transcodeSession.end":      func(n NotificationContainer) {},
-			"transcodeSession.update":   func(n NotificationContainer) {},
-			"preference":                func(n NotificationContainer) {},
-			"update.statechange":        func(n NotificationContainer) {},
+			"account":                   func(n NotificationContainer) {},
 			"activity":                  func(n NotificationContainer) {},
 			"backgroundProcessingQueue": func(n NotificationContainer) {},
+			"playing":                   func(n NotificationContainer) {},
+			"preference":                func(n NotificationContainer) {},
+			"reachability":              func(n NotificationContainer) {},
+			"status":                    func(n NotificationContainer) {},
+			"timeline":                  func(n NotificationContainer) {},
+			"transcode.end":             func(n NotificationContainer) {},
+			"transcodeSession.end":      func(n NotificationContainer) {},
+			"transcodeSession.start":    func(n NotificationContainer) {},
+			"transcodeSession.update":   func(n NotificationContainer) {},
+			"update.statechange":        func(n NotificationContainer) {},
 		},
 	}
+}
+
+// OnActivity shows activities happened on plex
+func (e *NotificationEvents) OnActivity(fn func(n NotificationContainer)) {
+	e.events["activity"] = fn
 }
 
 // OnPlaying shows state information (resume, stop, pause) on a user consuming media in plex
