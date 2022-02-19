@@ -182,7 +182,13 @@ func (p *Plex) SubscribeToNotifications(events *NotificationEvents, interrupt <-
 		return
 	}
 
-	websocketURL := url.URL{Scheme: "ws", Host: plexURL.Host, Path: "/:/websockets/notifications"}
+	var scheme string
+	if plexURL.Scheme == "https" {
+		scheme = "wss"
+	} else {
+		scheme = "ws"
+	}
+	websocketURL := url.URL{Scheme: scheme, Host: plexURL.Host, Path: "/:/websockets/notifications"}
 
 	headers := http.Header{
 		"X-Plex-Token": []string{p.Token},
