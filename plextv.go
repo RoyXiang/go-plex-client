@@ -4,7 +4,6 @@ package plex
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
@@ -265,7 +264,7 @@ func (p Plex) SetWebhooks(webhooks []string) error {
 
 // MyAccount gets account info (i.e. plex pass, servers, username, etc) from plex tv
 func (p Plex) MyAccount() (UserPlexTV, error) {
-	endpoint := "/users/account"
+	endpoint := "/api/v2/user"
 
 	var account UserPlexTV
 
@@ -283,7 +282,7 @@ func (p Plex) MyAccount() (UserPlexTV, error) {
 		return account, errors.New(resp.Status)
 	}
 
-	if err := xml.NewDecoder(resp.Body).Decode(&account); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&account); err != nil {
 		return account, err
 	}
 
