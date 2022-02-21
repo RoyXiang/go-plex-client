@@ -11,6 +11,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const (
+	writeWait  = time.Second * 10
+	pongWait   = time.Second * 10
+	pingPeriod = time.Second * 5
+)
+
 // TimelineEntry ...
 type TimelineEntry struct {
 	Identifier    string `json:"identifier"`
@@ -210,11 +216,14 @@ func (p *Plex) SubscribeToNotifications(events *NotificationEvents, interrupt <-
 		return
 	}
 
-	done := make(chan struct{})
-
 	go func() {
 		defer c.Close()
-		defer close(done)
+
+		_ = c.SetReadDeadline(time.Now().Add(pongWait))
+		c.SetPongHandler(func(string) error {
+			_ = c.SetReadDeadline(time.Now().Add(pongWait))
+			return nil
+		})
 
 		for {
 			_, message, err := c.ReadMessage()
@@ -224,8 +233,6 @@ func (p *Plex) SubscribeToNotifications(events *NotificationEvents, interrupt <-
 				return
 			}
 
-			// fmt.Printf("\t%s\n", string(message))
-
 			var notif WebsocketNotification
 
 			if err := json.Unmarshal(message, &notif); err != nil {
@@ -233,7 +240,6 @@ func (p *Plex) SubscribeToNotifications(events *NotificationEvents, interrupt <-
 				continue
 			}
 
-			// fmt.Println(notif.Type)
 			fn, ok := events.events[notif.Type]
 
 			if !ok {
@@ -246,32 +252,21 @@ func (p *Plex) SubscribeToNotifications(events *NotificationEvents, interrupt <-
 	}()
 
 	go func() {
-		ticker := time.NewTicker(time.Second)
+		ticker := time.NewTicker(pingPeriod)
 		defer ticker.Stop()
 
 		for {
 			select {
-			case t := <-ticker.C:
-				err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
-
-				if err != nil {
-					fn(err)
+			case <-ticker.C:
+				_ = c.SetWriteDeadline(time.Now().Add(writeWait))
+				if err := c.WriteMessage(websocket.PingMessage, []byte("Hi?")); err != nil {
+					return
 				}
 			case <-interrupt:
 				// To cleanly close a connection, a client should send a close
 				// frame and wait for the server to close the connection.
-				err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-
-				if err != nil {
-					fn(err)
-				}
-
-				select {
-				case <-done:
-				case <-time.After(time.Second):
-					fmt.Println("closing websocket...")
-					c.Close()
-				}
+				_ = c.SetWriteDeadline(time.Now().Add(writeWait))
+				_ = c.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 		}
