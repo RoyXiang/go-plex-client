@@ -426,21 +426,9 @@ func (p *Plex) GetThumbnail(key, thumbnailID string) (*http.Response, error) {
 
 // Test your connection to your Plex Media Server
 func (p *Plex) Test() (bool, error) {
-	resp, err := p.get(plexURL+"/api/servers", p.Headers)
+	_, err := p.GetServerIdentity()
 
-	if err != nil {
-		return false, err
-	}
-
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusUnauthorized {
-		return false, errors.New(ErrorNotAuthorized)
-	} else if resp.StatusCode != http.StatusOK {
-		return false, fmt.Errorf(ErrorServerReplied, resp.StatusCode)
-	}
-
-	return true, nil
+	return err == nil, err
 }
 
 // KillTranscodeSession stops a transcode session
@@ -864,31 +852,41 @@ func (p *Plex) GetServersInfo() (ServerInfo, error) {
 	return result, nil
 }
 
+// GetServerIdentity returns the identity of your server
+func (p *Plex) GetServerIdentity() (ServerIdentity, error) {
+	query := fmt.Sprintf("%s/identity", p.URL)
+
+	resp, err := p.get(query, p.Headers)
+	if err != nil {
+		return ServerIdentity{}, err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusUnauthorized:
+		return ServerIdentity{}, errors.New(ErrorNotAuthorized)
+	case http.StatusOK:
+	default:
+		return ServerIdentity{}, fmt.Errorf(ErrorServerReplied, resp.StatusCode)
+	}
+
+	var identity ServerIdentity
+	if err := json.NewDecoder(resp.Body).Decode(&identity); err != nil {
+		return ServerIdentity{}, err
+	}
+
+	return identity, nil
+}
+
 // GetMachineID returns the machine id of the server with the associated access token
 func (p *Plex) GetMachineID() (string, error) {
 	if p.Token == "" {
 		return "", errors.New("a token is required to fetch machine id")
 	}
 
-	servers, err := p.GetServersInfo()
+	identity, err := p.GetServerIdentity()
 
-	if err != nil {
-		return "", err
-	}
-
-	var machineID string
-
-	for _, server := range servers.Server {
-		if server.AccessToken == p.Token {
-			machineID = server.MachineIdentifier
-		}
-	}
-
-	if machineID == "" {
-		return "", errors.New("could not fetch machine id")
-	}
-
-	return machineID, nil
+	return identity.MediaContainer.MachineIdentifier, err
 }
 
 // GetSections of your plex server. This is useful when inviting a user

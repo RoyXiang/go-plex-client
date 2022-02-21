@@ -637,6 +637,16 @@ type ServerInfo struct {
 	} `xml:"Server"`
 }
 
+// ServerIdentity the identity of your server
+type ServerIdentity struct {
+	MediaContainer struct {
+		Size              int    `json:"size"`
+		Claimed           bool   `json:"claimed"`
+		MachineIdentifier string `json:"machineIdentifier"`
+		Version           string `json:"version"`
+	} `json:"MediaContainer"`
+}
+
 // SectionIDResponse the section id (or library id) of your server
 // useful when inviting a user to the server
 type SectionIDResponse struct {
