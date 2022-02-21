@@ -575,6 +575,44 @@ type UserPlexTV struct {
 	Title string `json:"title"`
 }
 
+// SharedServersResponse shows the list of friends whom you shared server with
+type SharedServersResponse struct {
+	XMLName           xml.Name `xml:"MediaContainer"`
+	FriendlyName      string   `xml:"friendlyName,attr"`
+	Identifier        string   `xml:"identifier,attr"`
+	MachineIdentifier string   `xml:"machineIdentifier,attr"`
+	Size              int      `xml:"size,attr"`
+	Friends           []struct {
+		Id                 int    `xml:"id,attr"`
+		Username           string `xml:"username,attr"`
+		Email              string `xml:"email,attr"`
+		UserId             int    `xml:"userID,attr"`
+		Name               string `xml:"name,attr"`
+		AcceptedAt         int64  `xml:"acceptedAt,attr"`
+		InvitedAt          int64  `xml:"invitedAt,attr"`
+		AccessToken        string `xml:"accessToken,attr"`
+		AllowSync          bool   `xml:"allowSync,attr"`
+		AllowCameraUpload  bool   `xml:"allowCameraUpload,attr"`
+		AllowChannels      bool   `xml:"allowChannels,attr"`
+		AllowTuners        bool   `xml:"allowTuners,attr"`
+		AllowSubtitleAdmin bool   `xml:"allowSubtitleAdmin,attr"`
+		Owned              bool   `xml:"owned,attr"`
+		AllLibraries       bool   `xml:"allLibraries,attr"`
+		FilterAll          string `xml:"filterAll,attr"`
+		FilterMovies       string `xml:"filterMovies,attr"`
+		FilterMusic        string `xml:"filterMusic,attr"`
+		FilterPhotos       string `xml:"filterPhotos,attr"`
+		FilterTelevision   string `xml:"filterTelevision,attr"`
+		Sections           []struct {
+			Id     int    `xml:"id,attr"`
+			Key    int    `xml:"key,attr"`
+			Title  string `xml:"title,attr"`
+			Type   string `xml:"type,attr"`
+			Shared bool   `xml:"shared,attr"`
+		} `xml:"Section"`
+	} `xml:"SharedServer"`
+}
+
 type Services struct {
 	Identifier string `json:"identifier"`
 	Endpoint   string `json:"endpoint"`

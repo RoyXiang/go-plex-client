@@ -4,6 +4,7 @@ package plex
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/http"
@@ -287,4 +288,31 @@ func (p Plex) MyAccount() (UserPlexTV, error) {
 	}
 
 	return account, err
+}
+
+// GetSharedServers returns a list of friends whom you shared server with
+func (p Plex) GetSharedServers(identifier string) (SharedServersResponse, error) {
+	query := fmt.Sprintf("%s/api/servers/%s/shared_servers", plexURL, identifier)
+
+	var result SharedServersResponse
+
+	resp, err := p.get(query, p.Headers)
+	if err != nil {
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	switch resp.StatusCode {
+	case http.StatusUnauthorized:
+		return result, errors.New(ErrorInvalidToken)
+	case http.StatusOK:
+	default:
+		return result, fmt.Errorf(ErrorServerReplied, resp.StatusCode)
+	}
+
+	if err := xml.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return result, err
+	}
+
+	return result, nil
 }
