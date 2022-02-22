@@ -183,6 +183,11 @@ func (e *NotificationEvents) OnPlaying(fn func(n NotificationContainer)) {
 	e.events["playing"] = fn
 }
 
+// OnTimeline shows recently added/deleted items in plex libraries
+func (e *NotificationEvents) OnTimeline(fn func(n NotificationContainer)) {
+	e.events["timeline"] = fn
+}
+
 // OnTranscodeUpdate shows transcode information when a transcoding stream changes parameters
 func (e *NotificationEvents) OnTranscodeUpdate(fn func(n NotificationContainer)) {
 	e.events["transcodeSession.update"] = fn
