@@ -21,6 +21,8 @@ const (
 type TimelineEntry struct {
 	Identifier    string `json:"identifier"`
 	ItemID        string `json:"itemID"`
+	ParentItemID  string `json:"parentItemID"`
+	RootItemID    string `json:"rootItemID"`
 	MetadataState string `json:"metadataState"`
 	SectionID     string `json:"sectionID"`
 	State         int64  `json:"state"`
@@ -100,14 +102,14 @@ type TranscodeSession struct {
 // Setting ...
 type Setting struct {
 	Advanced bool   `json:"advanced"`
-	Default  string `json:"default"`
+	Default  bool   `json:"default"`
 	Group    string `json:"group"`
 	Hidden   bool   `json:"hidden"`
 	ID       string `json:"id"`
 	Label    string `json:"label"`
 	Summary  string `json:"summary"`
 	Type     string `json:"type"`
-	Value    int64  `json:"value"`
+	Value    string `json:"value"`
 }
 
 // NotificationContainer read pms notifications
