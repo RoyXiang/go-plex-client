@@ -163,6 +163,7 @@ func NewNotificationEvents() *NotificationEvents {
 			"backgroundProcessingQueue": func(n NotificationContainer) {},
 			"playing":                   func(n NotificationContainer) {},
 			"preference":                func(n NotificationContainer) {},
+			"progress":                  func(n NotificationContainer) {},
 			"reachability":              func(n NotificationContainer) {},
 			"status":                    func(n NotificationContainer) {},
 			"timeline":                  func(n NotificationContainer) {},
