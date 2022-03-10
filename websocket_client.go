@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -99,17 +100,54 @@ type TranscodeSession struct {
 	VideoDecision        string  `json:"videoDecision"`
 }
 
+type ConfigValue string
+
+func (c *ConfigValue) UnmarshalJSON(data []byte) error {
+	const quote = rune('"')
+	if len(data) >= 2 && rune(data[0]) == quote && rune(data[len(data)-1]) == quote {
+		*c = ConfigValue(data[1 : len(data)-1])
+	} else {
+		*c = ConfigValue(data)
+	}
+	return nil
+}
+
+func (c ConfigValue) String() string {
+	return string(c)
+}
+
+func (c ConfigValue) Boolean() bool {
+	if value, err := strconv.ParseBool(string(c)); err == nil {
+		return value
+	}
+	return false
+}
+
+func (c ConfigValue) Int() int {
+	if value, err := strconv.Atoi(string(c)); err == nil {
+		return value
+	}
+	return 0
+}
+
+func (c ConfigValue) Float64() float64 {
+	if value, err := strconv.ParseFloat(string(c), 64); err == nil {
+		return value
+	}
+	return 0
+}
+
 // Setting ...
 type Setting struct {
-	Advanced bool   `json:"advanced"`
-	Default  bool   `json:"default"`
-	Group    string `json:"group"`
-	Hidden   bool   `json:"hidden"`
-	ID       string `json:"id"`
-	Label    string `json:"label"`
-	Summary  string `json:"summary"`
-	Type     string `json:"type"`
-	Value    string `json:"value"`
+	Advanced bool        `json:"advanced"`
+	Default  ConfigValue `json:"default"`
+	Group    string      `json:"group"`
+	Hidden   bool        `json:"hidden"`
+	ID       string      `json:"id"`
+	Label    string      `json:"label"`
+	Summary  string      `json:"summary"`
+	Type     string      `json:"type"`
+	Value    ConfigValue `json:"value"`
 }
 
 // NotificationContainer read pms notifications

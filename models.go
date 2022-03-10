@@ -70,6 +70,7 @@ type Metadata struct {
 	ParentTitle           string       `json:"parentTitle"`
 	RatingCount           string       `json:"ratingCount"`
 	Rating                float64      `json:"rating"`
+	AltRatings            []AltRating  `json:"Rating"`
 	RatingKey             string       `json:"ratingKey"`
 	SessionKey            string       `json:"sessionKey"`
 	Summary               string       `json:"summary"`
@@ -90,6 +91,14 @@ type Metadata struct {
 // AltGUID represents a Globally Unique Identifier for a metadata provider that is not actively being used.
 type AltGUID struct {
 	ID string `json:"id"`
+}
+
+// AltRating represents different ratings from several sites
+type AltRating struct {
+	Count string `json:"count"`
+	Image string `json:"image"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
 }
 
 // Media media info
