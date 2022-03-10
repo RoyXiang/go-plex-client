@@ -113,7 +113,7 @@ type Media struct {
 	Has64bitOffsets       bool        `json:"has64bitOffsets"`
 	Height                int         `json:"height"`
 	ID                    json.Number `json:"id"`
-	OptimizedForStreaming bool        `json:"optimizedForStreaming"` // plex can return int or boolean: 0 or 1; true or false
+	OptimizedForStreaming ConfigValue `json:"optimizedForStreaming"` // plex can return int or boolean: 0 or 1; true or false
 	Selected              bool        `json:"selected"`
 	VideoCodec            string      `json:"videoCodec"`
 	VideoFrameRate        string      `json:"videoFrameRate"`
