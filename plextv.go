@@ -296,7 +296,7 @@ func (p Plex) GetSharedServers(identifier string) (SharedServersResponse, error)
 
 	var result SharedServersResponse
 
-	resp, err := p.get(query, p.Headers)
+	resp, err := p.grab(query, p.Headers)
 	if err != nil {
 		return result, err
 	}
