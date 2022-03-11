@@ -95,10 +95,10 @@ type AltGUID struct {
 
 // AltRating represents different ratings from several sites
 type AltRating struct {
-	Count string `json:"count"`
-	Image string `json:"image"`
-	Type  string `json:"type"`
-	Value string `json:"value"`
+	Count json.Number `json:"count"`
+	Image string      `json:"image"`
+	Type  string      `json:"type"`
+	Value json.Number `json:"value"`
 }
 
 // Media media info
